@@ -10,6 +10,8 @@ library(dplyr)
 if(!require(ggplot2)) install.packages("ggplot2")
 library(ggplot2)
 
+library(gridExtra)
+
 
 if (!file.exists("arvores_cubadas.csv")) {
   stop("O arquivo 'arvores_cubadas.csv' não foi encontrado no diretório atual.")
@@ -28,6 +30,8 @@ if (!all(required_columns %in% colnames(dados_cubagem))) {
 dados_cubagem[required_columns] <- lapply(dados_cubagem[required_columns], as.numeric)
 
 rm(required_columns)
+
+# Área de cada seção
 
 dados_cubagem["gi"] <- (pi*(dados_cubagem["di"])^2/40000)
 
@@ -71,16 +75,20 @@ if (file.exists("dados_cubagem_volume.csv")) {
 }  
 
 # Gráfico de dispersão DAP x  Volume.
-grafico <- ggplot(dados_cubagem_agrupados, aes(x = DAP, y = volume_arvore)) +
+grafico1 <- ggplot(dados_cubagem_agrupados, aes(x = DAP, y = volume_arvore)) +
                 geom_point() +
                 labs( x = "DAP (cm)", y = "Volume da árvore (m³)") +
                 ggtitle("Gráfico de dispersão da relação entre DAP e volume") +
-                theme_minimal()
+                theme_classic()
 
-ggsave("grafico_DAP_volume.png", plot = grafico, width = 8, height = 6, bg = "white")
+ggsave("grafico_DAP_volume.png", plot = grafico1, width = 8, height = 6, bg = "white")
 
+grafico2 <- ggplot(dados_cubagem_agrupados, aes(x = altura, y = volume_arvore)) +
+  geom_point() +
+  labs( x = "altura (m)", y = "Volume da árvore (m³)") +
+  ggtitle("Gráfico de dispersão da relação entre altura e volume") +
+  theme_classic()
 
-plot(grafico)
+ggsave("grafico_altura_volume.png", plot = grafico2, width = 8, height = 6, bg = "white")
 
-  
-  
+grid.arrange(grafico1, grafico2, ncol = 2)
